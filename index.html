@@ -1119,158 +1119,6 @@
       justify-content: flex-end;
     }
 
-    .comment-toggle {
-      background: none;
-      border: none;
-      color: var(--warm-text-soft);
-      font-size: 13px;
-      cursor: pointer;
-      padding: 4px 8px;
-      border-radius: 6px;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .comment-toggle:hover {
-      background: var(--warm-bg-soft);
-      color: var(--warm-primary);
-    }
-
-    .comment-toggle[aria-expanded="true"] {
-      color: var(--warm-primary);
-    }
-
-    .comments-section {
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px solid var(--warm-border-light);
-    }
-
-    .comments-list {
-      margin-bottom: 12px;
-    }
-
-    .comments-empty {
-      margin: 8px 0;
-      color: var(--warm-text-muted);
-      font-size: 13px;
-      text-align: center;
-    }
-
-    .comment-item {
-      display: flex;
-      gap: 10px;
-      padding: 8px 0;
-      border-bottom: 1px solid var(--warm-border-light);
-    }
-
-    .comment-item:last-child {
-      border-bottom: none;
-    }
-
-    .comment-avatar {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--warm-primary), var(--warm-secondary));
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: 600;
-      flex-shrink: 0;
-    }
-
-    .comment-body {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .comment-meta {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 2px;
-    }
-
-    .comment-nickname {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--warm-text);
-    }
-
-    .comment-time {
-      font-size: 11px;
-      color: var(--warm-text-muted);
-    }
-
-    .comment-text {
-      margin: 0;
-      font-size: 13px;
-      color: var(--warm-text);
-      line-height: 1.6;
-      word-break: break-word;
-    }
-
-    .comment-form {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .comment-input-row {
-      display: flex;
-      gap: 6px;
-      align-items: flex-end;
-    }
-
-    .comment-textarea {
-      flex: 1;
-      padding: 8px 10px;
-      border: 1px solid var(--warm-border);
-      border-radius: 8px;
-      font-size: 13px;
-      background: var(--warm-bg);
-      color: var(--warm-text);
-      resize: none;
-      outline: none;
-      font-family: inherit;
-      line-height: 1.5;
-      box-sizing: border-box;
-      transition: border-color 0.2s ease;
-      min-height: 36px;
-      max-height: 120px;
-    }
-
-    .comment-textarea:focus {
-      border-color: var(--warm-primary);
-    }
-
-    .comment-submit {
-      padding: 0 14px;
-      height: 36px;
-      border: none;
-      border-radius: 8px;
-      background: linear-gradient(135deg, var(--warm-primary), var(--warm-secondary));
-      color: white;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: opacity 0.2s ease, transform 0.1s ease;
-      flex-shrink: 0;
-    }
-
-    .comment-submit:hover {
-      opacity: 0.9;
-    }
-
-    .comment-submit:active {
-      transform: scale(0.96);
-    }
-
     .entry-content {
       margin: 0;
       color: var(--warm-text);
@@ -2530,8 +2378,7 @@
         updatedAt: notebook.updatedAt || notebook.createdAt || now,
         entries: Array.isArray(notebook.entries) ? notebook.entries : [],
         importantDates: Array.isArray(notebook.importantDates) ? notebook.importantDates : [],
-        shareToken: notebook.shareToken || createShareToken(),
-        commentBucketId: notebook.commentBucketId || ""
+        shareToken: notebook.shareToken || createShareToken()
       };
     }
 
@@ -2548,7 +2395,7 @@
         };
       }
 
-      // 未注册用户（如通过分享链接进入的浏览者）也能加载已保存的笔记本（含评论）
+      // 未注册用户（如通过分享链接进入的浏览者）也能加载已保存的笔记本
       if (saved && Array.isArray(saved.notebooks) && saved.notebooks.length > 0) {
         return {
           user: null,
@@ -2779,53 +2626,6 @@
       }, 3000);
     }
 
-    function showShareLinkToast(url) {
-      if (!toastEl) return;
-      toastEl.innerHTML = "";
-      const text = document.createElement("span");
-      text.textContent = "评论已发布，发给对方查看";
-      text.style.marginRight = "10px";
-      const btn = document.createElement("button");
-      btn.textContent = "复制链接";
-      btn.style.cssText = "background:rgba(255,255,255,0.25);color:#fff;border:none;padding:4px 12px;border-radius:12px;font-size:12px;cursor:pointer;margin-right:6px;";
-      btn.onclick = async () => {
-        try {
-          if (navigator.clipboard) {
-            await navigator.clipboard.writeText(url);
-          } else {
-            const ta = document.createElement("textarea");
-            ta.value = url;
-            document.body.appendChild(ta);
-            ta.select();
-            document.execCommand("copy");
-            document.body.removeChild(ta);
-          }
-          btn.textContent = "已复制 ✓";
-          setTimeout(() => { btn.textContent = "复制链接"; }, 1500);
-        } catch {
-          btn.textContent = "复制失败";
-        }
-      };
-      toastEl.appendChild(text);
-      toastEl.appendChild(btn);
-      // 支持系统分享的设备额外显示分享按钮
-      if (navigator.share) {
-        const shareBtn = document.createElement("button");
-        shareBtn.textContent = "分享";
-        shareBtn.style.cssText = "background:rgba(255,255,255,0.25);color:#fff;border:none;padding:4px 12px;border-radius:12px;font-size:12px;cursor:pointer;";
-        shareBtn.onclick = () => {
-          navigator.share({ title: "故事本", url: url }).catch(() => {});
-        };
-        toastEl.appendChild(shareBtn);
-      }
-      toastEl.classList.add("show");
-      if (toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => {
-        toastEl.classList.remove("show");
-        toastTimer = null;
-      }, 8000);
-    }
-
     function selectGender(gender) {
       selectedGender = gender;
       genderButtons.forEach((button) => {
@@ -3018,7 +2818,6 @@
       entries.forEach((entry) => {
         const card = document.createElement("article");
         card.className = "entry-card";
-        const comments = entry.comments || [];
         card.innerHTML = `
           <header class="entry-header">
             <div class="entry-avatar">${appData.user?.avatar ? `<img src="${appData.user.avatar}" alt="我的头像" />` : avatarFallbackSvg(36)}</div>
@@ -3038,82 +2837,11 @@
               `).join("")}
             </div>
           ` : ""}
-          <footer class="entry-footer">
-            <button class="comment-toggle" type="button" data-entry-id="${entry.id}" aria-expanded="false">
-              💬 <span class="comment-count">${comments.length ? `${comments.length} 条评论` : "评论"}</span>
-            </button>
-          </footer>
-          <div class="comments-section" id="comments-${entry.id}" hidden>
-            <div class="comments-list">
-              ${comments.length === 0 ? `<p class="comments-empty">还没有评论，来说点什么吧～</p>` : comments.map(c => `
-                <div class="comment-item">
-                  <div class="comment-avatar">${escapeHtml((c.nickname || "访客")[0])}</div>
-                  <div class="comment-body">
-                    <div class="comment-meta">
-                      <span class="comment-nickname">${escapeHtml(c.nickname || "访客")}</span>
-                      <span class="comment-time">${relativeTime(c.createdAt)}</span>
-                    </div>
-                    <p class="comment-text">${escapeHtml(c.text || "")}</p>
-                  </div>
-                </div>
-              `).join("")}
-            </div>
-            <form class="comment-form" data-entry-id="${entry.id}">
-              <div class="comment-input-row">
-                <textarea class="comment-textarea" placeholder="写下你的评论…" maxlength="200" rows="1"></textarea>
-                <button type="submit" class="comment-submit">发布</button>
-              </div>
-            </form>
-          </div>
         `;
 
         card.querySelector(".entry-delete")?.addEventListener("click", () => deleteEntry(entry.id));
         card.querySelectorAll(".entry-image-button").forEach((button) => {
           button.addEventListener("click", () => openLightbox(entry.images[Number(button.dataset.imageIndex)]));
-        });
-
-        // 评论展开/收起
-        const toggleBtn = card.querySelector(".comment-toggle");
-        const commentsSection = card.querySelector(".comments-section");
-        toggleBtn.addEventListener("click", () => {
-          const expanded = toggleBtn.getAttribute("aria-expanded") === "true";
-          toggleBtn.setAttribute("aria-expanded", String(!expanded));
-          commentsSection.hidden = expanded;
-        });
-
-        // 评论提交
-        const commentForm = card.querySelector(".comment-form");
-        commentForm.addEventListener("submit", async (e) => {
-          e.preventDefault();
-          const textarea = commentForm.querySelector(".comment-textarea");
-          const text = textarea.value.trim();
-          if (!text) {
-            textarea.focus();
-            return;
-          }
-          const submitBtn = commentForm.querySelector(".comment-submit");
-          const originalBtnText = submitBtn.textContent;
-          submitBtn.textContent = "发布中…";
-          submitBtn.disabled = true;
-          await addComment(entry.id, text);
-          submitBtn.textContent = originalBtnText;
-          submitBtn.disabled = false;
-          // addComment 内部已调用 renderDetail，这里处理展开状态保持
-          setTimeout(() => {
-            const section = document.getElementById(`comments-${entry.id}`);
-            if (section) {
-              section.hidden = false;
-              const btn = document.querySelector(`.comment-toggle[data-entry-id="${entry.id}"]`);
-              if (btn) btn.setAttribute("aria-expanded", "true");
-            }
-          }, 0);
-        });
-
-        // 评论输入框自适应高度
-        const textarea = card.querySelector(".comment-textarea");
-        textarea.addEventListener("input", () => {
-          textarea.style.height = "auto";
-          textarea.style.height = Math.min(textarea.scrollHeight, 120) + "px";
         });
 
         timeline.appendChild(card);
@@ -3303,94 +3031,6 @@
       saveCurrentNotebook((notebook) => {
         notebook.entries = (notebook.entries || []).filter((entry) => entry.id !== entryId);
       });
-    }
-
-    async function addComment(entryId, text) {
-      const notebook = getCurrentNotebook();
-      if (!notebook) return;
-      const entry = (notebook.entries || []).find(e => e.id === entryId);
-      if (!entry) return;
-      if (!Array.isArray(entry.comments)) entry.comments = [];
-      entry.comments.push({
-        id: createId(),
-        nickname: "访客",
-        text: text,
-        createdAt: new Date().toISOString()
-      });
-      notebook.updatedAt = new Date().toISOString();
-      saveAppData();
-      renderDetail();
-
-      // 只读模式下，同步评论到云端
-      if (isReadOnlyMode) {
-        // 优先使用 kvdb.io 评论同步
-        if (notebook.commentBucketId) {
-          try {
-            const commentsData = collectComments(notebook);
-            const uploaded = await uploadCommentsToBucket(notebook.commentBucketId, notebook.id, commentsData);
-            showToast(uploaded ? "评论已发布" : "评论已发布到本地");
-            return;
-          } catch (e) {
-            console.error("评论同步失败:", e);
-          }
-          showToast("评论已发布到本地");
-          return;
-        }
-
-        // 回退：旧版链接无 cb 参数时，上传整个笔记本到新 paste
-        try {
-          const slim = JSON.parse(JSON.stringify(notebook));
-          delete slim.shareToken;
-          delete slim.updatedAt;
-          delete slim.createdAt;
-          delete slim.commentBucketId;
-          if (slim.importantDates && slim.importantDates.length === 0) delete slim.importantDates;
-          if (slim.importantDates) {
-            slim.importantDates = slim.importantDates.map(d => ({ d: d.date, desc: d.description }));
-          }
-          if (slim.entries) {
-            slim.entries = slim.entries.map(e => {
-              const o = { id: e.id, t: e.text || "" };
-              if (e.images && e.images.length) o.i = e.images;
-              if (e.date) o.d = e.date;
-              if (e.comments && e.comments.length) {
-                o.cs = e.comments.map(c => ({ n: c.nickname || "访客", x: c.text || "", t: c.createdAt }));
-              }
-              return o;
-            });
-          }
-          slim.n = slim.name;
-          slim.c = slim.coverColor;
-          delete slim.name;
-          delete slim.coverColor;
-
-          let dataStr = JSON.stringify(slim);
-          if (dataStr.length > 400000) {
-            const lite = JSON.parse(JSON.stringify(slim));
-            lite.entries = (lite.entries || []).map(e => {
-              const o = { id: e.id, t: e.t || "", d: e.d };
-              if (e.cs && e.cs.length) o.cs = e.cs;
-              return o;
-            });
-            dataStr = JSON.stringify(lite);
-          }
-
-          const pasteResult = await uploadToPaste(dataStr);
-          if (pasteResult) {
-            const baseUrl = new URL(window.location.href);
-            baseUrl.search = "";
-            baseUrl.hash = "";
-            baseUrl.searchParams.set("p", pasteResult.service + ":" + pasteResult.id);
-            const newUrl = baseUrl.toString();
-            window.history.replaceState({}, "", newUrl);
-            showShareLinkToast(newUrl);
-            return;
-          }
-        } catch (e) {
-          console.error("评论上传失败:", e);
-        }
-        showToast("评论已发布到本地");
-      }
     }
 
     function addImportantDate() {
@@ -3590,165 +3230,6 @@
       return await corsGet(rawUrl, 10000);
     }
 
-    // ====== kvdb.io 评论同步服务 ======
-    // 创建评论存储 bucket，返回 bucketId
-    async function createCommentBucket() {
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
-        const resp = await fetch("https://kvdb.io", {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: "email=shared-notebook@app.local",
-          signal: controller.signal
-        });
-        clearTimeout(timeoutId);
-        if (resp.ok) {
-          const bucketId = (await resp.text()).trim();
-          if (bucketId && bucketId.length > 5) return bucketId;
-        }
-      } catch {}
-      // 尝试通过 CORS 代理
-      try {
-        const result = await corsPost("https://kvdb.io", "email=shared-notebook@app.local", 10000);
-        if (result) {
-          const bucketId = result.trim();
-          if (bucketId && bucketId.length > 5) return bucketId;
-        }
-      } catch {}
-      return null;
-    }
-
-    // 上传评论数据到 kvdb.io（PUT 更新）
-    async function uploadCommentsToBucket(bucketId, notebookId, commentsData) {
-      const key = notebookId.replace(/[^a-zA-Z0-9_:-]/g, "_");
-      const url = `https://kvdb.io/${bucketId}/${key}`;
-      const body = JSON.stringify(commentsData);
-      // 直接 PUT（kvdb.io 支持 CORS）
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
-        const resp = await fetch(url, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: body,
-          signal: controller.signal
-        });
-        clearTimeout(timeoutId);
-        if (resp.ok) return true;
-      } catch {}
-      // 尝试通过 CORS 代理
-      try {
-        const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(url);
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
-        const resp = await fetch(proxyUrl, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: body,
-          signal: controller.signal
-        });
-        clearTimeout(timeoutId);
-        if (resp.ok) return true;
-      } catch {}
-      return false;
-    }
-
-    // 从 kvdb.io 获取评论数据
-    async function fetchCommentsFromBucket(bucketId, notebookId) {
-      const key = notebookId.replace(/[^a-zA-Z0-9_:-]/g, "_");
-      const url = `https://kvdb.io/${bucketId}/${key}`;
-      // 先直连
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000);
-        const resp = await fetch(url, { signal: controller.signal });
-        clearTimeout(timeoutId);
-        if (resp.ok) {
-          const text = await resp.text();
-          if (text && text.trim()) return JSON.parse(text);
-        }
-      } catch {}
-      // 通过 CORS 代理
-      try {
-        const text = await corsGet(url, 10000);
-        if (text && text.trim()) return JSON.parse(text);
-      } catch {}
-      return null;
-    }
-
-    // 收集笔记本中所有评论，按 entryId 分组
-    function collectComments(notebook) {
-      const data = {};
-      (notebook.entries || []).forEach((entry) => {
-        if (entry.comments && entry.comments.length > 0) {
-          data[entry.id] = entry.comments.map(c => ({
-            n: c.nickname || "访客",
-            x: c.text || "",
-            t: c.createdAt || new Date().toISOString()
-          }));
-        }
-      });
-      return data;
-    }
-
-    // 将云端评论合并到笔记本的 entries 中
-    function mergeCloudComments(notebook, cloudComments) {
-      if (!cloudComments || typeof cloudComments !== "object") return;
-      (notebook.entries || []).forEach((entry) => {
-        const cloudEntryComments = cloudComments[entry.id];
-        if (cloudEntryComments && Array.isArray(cloudEntryComments)) {
-          const localComments = entry.comments || [];
-          const allComments = [...localComments];
-          for (const cc of cloudEntryComments) {
-            const exists = localComments.some(lc =>
-              lc.text === (cc.x || cc.text || "") &&
-              lc.nickname === (cc.n || cc.nickname || "访客") &&
-              lc.createdAt === (cc.t || cc.createdAt || "")
-            );
-            if (!exists) {
-              allComments.push({
-                id: createId(),
-                nickname: cc.n || cc.nickname || "访客",
-                text: cc.x || cc.text || "",
-                createdAt: cc.t || cc.createdAt || new Date().toISOString()
-              });
-            }
-          }
-          entry.comments = allComments;
-        }
-      });
-    }
-
-    // 同步单个笔记本的云端评论（用于用户端打开时自动拉取）
-    async function syncCommentsForNotebook(notebook) {
-      if (!notebook.commentBucketId) return false;
-      const cloudComments = await fetchCommentsFromBucket(notebook.commentBucketId, notebook.id);
-      if (cloudComments) {
-        const before = JSON.stringify(notebook.entries);
-        mergeCloudComments(notebook, cloudComments);
-        const after = JSON.stringify(notebook.entries);
-        return before !== after;
-      }
-      return false;
-    }
-
-    // 为所有有 commentBucketId 的笔记本同步评论
-    async function syncAllCommentBuckets() {
-      if (!appData.user?.nickname) return;
-      let changed = false;
-      for (const notebook of appData.notebooks) {
-        if (notebook.commentBucketId) {
-          const updated = await syncCommentsForNotebook(notebook);
-          if (updated) changed = true;
-        }
-      }
-      if (changed) {
-        saveAppData();
-        if (currentNotebookId) renderDetail();
-      }
-    }
-
     async function shareNotebook() {
       const notebook = getCurrentNotebook();
       if (!notebook) return;
@@ -3781,14 +3262,6 @@
             const o = { id: e.id, t: e.text || "" };
             if (e.images && e.images.length) o.i = e.images;
             if (e.date) o.d = e.date;
-            // 评论数据：精简字段名
-            if (e.comments && e.comments.length) {
-              o.cs = e.comments.map(c => ({
-                n: c.nickname || "访客",
-                x: c.text || "",
-                t: c.createdAt
-              }));
-            }
             return o;
           });
         }
@@ -3800,12 +3273,11 @@
 
         let dataStr = JSON.stringify(slim);
 
-        // 数据过大时剥离图片（保留文字和评论）
+        // 数据过大时剥离图片
         if (dataStr.length > MAX_FOR_CLOUD) {
           const lite = JSON.parse(JSON.stringify(slim));
           lite.entries = (lite.entries || []).map((e) => {
             const o = { id: e.id, t: e.t || "", d: e.d };
-            if (e.cs && e.cs.length) o.cs = e.cs; // 保留评论
             return o;
           });
           dataStr = JSON.stringify(lite);
@@ -3815,15 +3287,6 @@
         // 上传到云端 paste 服务
         shareButton.textContent = "上传中…";
         const pasteResult = await uploadToPaste(dataStr);
-
-        // 创建或复用评论同步 bucket
-        if (!notebook.commentBucketId) {
-          const bucketId = await createCommentBucket();
-          if (bucketId) {
-            notebook.commentBucketId = bucketId;
-            saveAppData();
-          }
-        }
 
         const baseUrl = new URL(window.location.href);
         baseUrl.search = "";
@@ -3835,9 +3298,6 @@
         if (pasteResult) {
           // 云端分享：链接只带服务标识和短ID
           baseUrl.searchParams.set("p", pasteResult.service + ":" + pasteResult.id);
-          if (notebook.commentBucketId) {
-            baseUrl.searchParams.set("cb", notebook.commentBucketId);
-          }
           shareUrl = baseUrl.toString();
 
           // 尝试用短链接服务进一步缩短（后台尝试，不阻塞主流程）
@@ -3864,7 +3324,6 @@
           if (toBase64Url(finalData).length > 2000) {
             const ultraLite = { n: slim.n, c: slim.c, entries: (slim.entries || []).slice(0, 5).map(e => {
               const o = { id: e.id, t: e.t?.substring(0, 100) || "", d: e.d };
-              if (e.cs && e.cs.length) o.cs = e.cs.slice(0, 3); // 保留前3条评论
               return o;
             }) };
             finalData = JSON.stringify(ultraLite);
@@ -3872,9 +3331,6 @@
           }
           const encoded = toBase64Url(finalData);
           baseUrl.searchParams.set("d", encoded);
-          if (notebook.commentBucketId) {
-            baseUrl.searchParams.set("cb", notebook.commentBucketId);
-          }
           shareUrl = baseUrl.toString();
         }
 
@@ -4168,18 +3624,6 @@
             images: e.images || e.i || [],
             date: e.date || e.d || new Date().toISOString().split("T")[0]
           };
-          // 还原评论数据（精简格式 cs → comments）
-          if (e.cs && Array.isArray(e.cs)) {
-            entry.comments = e.cs.map(c => ({
-              id: createId(),
-              nickname: c.nickname || c.n || "匿名",
-              text: c.text || c.x || "",
-              createdAt: c.createdAt || c.t || new Date().toISOString()
-            }));
-          } else if (e.comments && Array.isArray(e.comments)) {
-            // 兼容未精简的格式
-            entry.comments = e.comments;
-          }
           return entry;
         });
       }
@@ -4197,30 +3641,22 @@
       if (pasteParam) {
         const parts = pasteParam.split(":");
         if (parts.length >= 2) {
-          const cbParam = queryParams.get("cb") || "";
-          loadSharedFromPaste(parts[0], parts.slice(1).join(":"), cbParam);
+          loadSharedFromPaste(parts[0], parts.slice(1).join(":"));
           return;
         }
       }
 
       // URL 直连模式: ?d=... 或 ?data=...
       const sharedData = queryParams.get("d") || queryParams.get("data");
-      const cbParamForDirect = queryParams.get("cb") || "";
       if (sharedData) {
         try {
           const sharedNotebook = parseSharedNotebook(sharedData);
           if (sharedNotebook && sharedNotebook.id) {
-            if (cbParamForDirect) {
-              sharedNotebook.commentBucketId = cbParamForDirect;
-            }
             const existingIdx = appData.notebooks.findIndex((n) => n.id === sharedNotebook.id);
             if (existingIdx === -1) {
               appData.notebooks.push(sharedNotebook);
             } else {
               const localNb = appData.notebooks[existingIdx];
-              if (!localNb.commentBucketId && sharedNotebook.commentBucketId) {
-                localNb.commentBucketId = sharedNotebook.commentBucketId;
-              }
               (sharedNotebook.entries || []).forEach((sharedEntry) => {
                 let localEntry = (localNb.entries || []).find(e => e.id === sharedEntry.id);
                 if (!localEntry) {
@@ -4229,19 +3665,7 @@
                     JSON.stringify(e.images || []) === JSON.stringify(sharedEntry.images || [])
                   );
                 }
-                if (localEntry) {
-                  const localComments = localEntry.comments || [];
-                  const sharedComments = sharedEntry.comments || [];
-                  const allComments = [...localComments];
-                  for (const sc of sharedComments) {
-                    const exists = localComments.some(lc =>
-                      lc.text === sc.text && lc.nickname === sc.nickname &&
-                      lc.createdAt === sc.createdAt
-                    );
-                    if (!exists) allComments.push(sc);
-                  }
-                  localEntry.comments = allComments;
-                } else {
+                if (!localEntry) {
                   localNb.entries = localNb.entries || [];
                   localNb.entries.push(sharedEntry);
                 }
@@ -4254,20 +3678,6 @@
             updateUserUI();
             renderDetail();
             showPage("detail");
-            // 异步拉取云端评论并更新
-            if (sharedNotebook.commentBucketId) {
-              (async () => {
-                const cloudComments = await fetchCommentsFromBucket(sharedNotebook.commentBucketId, sharedNotebook.id);
-                if (cloudComments) {
-                  const nb = getCurrentNotebook();
-                  if (nb) {
-                    mergeCloudComments(nb, cloudComments);
-                    saveAppData();
-                    renderDetail();
-                  }
-                }
-              })();
-            }
             return;
           }
         } catch (e) {
@@ -4293,14 +3703,12 @@
 
       if (appData.user?.nickname) {
         renderHome();
-        // 异步同步所有已分享笔记本的云端评论
-        syncAllCommentBuckets();
       } else {
         startSplash();
       }
     }
 
-    async function loadSharedFromPaste(service, id, commentBucketId) {
+    async function loadSharedFromPaste(service, id) {
       // 先显示加载状态
       showPage("shareLoading");
 
@@ -4322,31 +3730,13 @@
         const parsed = JSON.parse(jsonStr);
         const nb = parseSharedNotebookFromObject(parsed);
         if (nb && nb.id) {
-          // 从 URL 参数设置 commentBucketId（优先于数据中自带的）
-          if (commentBucketId) {
-            nb.commentBucketId = commentBucketId;
-          }
-
-          // 从 kvdb.io 拉取云端评论并合并到分享数据中
-          const bucketId = nb.commentBucketId;
-          if (bucketId) {
-            const cloudComments = await fetchCommentsFromBucket(bucketId, nb.id);
-            if (cloudComments) {
-              mergeCloudComments(nb, cloudComments);
-            }
-          }
-
           const existingIdx = appData.notebooks.findIndex((n) => n.id === nb.id);
           if (existingIdx === -1) {
             // 本地没有该笔记本，直接添加
             appData.notebooks.push(nb);
           } else {
-            // 本地已有该笔记本，合并 entries 和评论
+            // 本地已有该笔记本，合并 entries
             const localNb = appData.notebooks[existingIdx];
-            // 同步 commentBucketId
-            if (!localNb.commentBucketId && nb.commentBucketId) {
-              localNb.commentBucketId = nb.commentBucketId;
-            }
             (nb.entries || []).forEach((sharedEntry) => {
               // 先按 ID 匹配
               let localEntry = (localNb.entries || []).find(e => e.id === sharedEntry.id);
@@ -4357,20 +3747,7 @@
                   JSON.stringify(e.images || []) === JSON.stringify(sharedEntry.images || [])
                 );
               }
-              if (localEntry) {
-                // 合并评论：本地评论 + 云端评论（去重）
-                const localComments = localEntry.comments || [];
-                const sharedComments = sharedEntry.comments || [];
-                const allComments = [...localComments];
-                for (const sc of sharedComments) {
-                  const exists = localComments.some(lc =>
-                    lc.text === sc.text && lc.nickname === sc.nickname &&
-                    lc.createdAt === sc.createdAt
-                  );
-                  if (!exists) allComments.push(sc);
-                }
-                localEntry.comments = allComments;
-              } else {
+              if (!localEntry) {
                 localNb.entries = localNb.entries || [];
                 localNb.entries.push(sharedEntry);
               }
@@ -4411,18 +3788,6 @@
             images: e.images || e.i || [],
             date: e.date || e.d || new Date().toISOString().split("T")[0]
           };
-          // 还原评论数据（精简格式 cs → comments）
-          if (e.cs && Array.isArray(e.cs)) {
-            entry.comments = e.cs.map(c => ({
-              id: createId(),
-              nickname: c.nickname || c.n || "匿名",
-              text: c.text || c.x || "",
-              createdAt: c.createdAt || c.t || new Date().toISOString()
-            }));
-          } else if (e.comments && Array.isArray(e.comments)) {
-            // 兼容未精简的格式
-            entry.comments = e.comments;
-          }
           return entry;
         });
       }
